@@ -96,18 +96,8 @@ class HomeMineTest(unittest.TestCase):
         element_ticket = self.driver.find_element_by_id(Page_config.PageID.buy_month_ticketID)
         self.assertEqual(element_ticket.text, u'购买')
         element_ticket.click()
-        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.vip_info))
-        element_vipText = self.driver.find_element_by_id(Page_config.PageID.vip_info).text
-        self.assertEqual(element_vipText, u'当前为游客，请登录后开通VIP')
-        while True:
-            try:
-                self.driver.find_element_by_id(Page_config.PageID.pay_buttonID).click()
-                WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.logInID))
-                break
-            except Exception, e:
-                Swipe_op.SwipeDown(self)
-        for x in range(1, 3):
-            self.driver.find_element_by_accessibility_id('转到上一层级').click()
+        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.logInID))
+        self.driver.find_element_by_accessibility_id('转到上一层级').click()
         print '未登录状态下点击购买月票跳转登录页面测试通过'
 
         # 点击VIP状态跳转

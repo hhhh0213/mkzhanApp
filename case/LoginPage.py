@@ -95,25 +95,10 @@ class LoginTest(unittest.TestCase):
             except Exception, e:
                 continue
 
-        # 输入框删除图标在默认机型上的相对坐标
-        x1 = 604.00 / 720
-        y1 = 480.00 / 1280
-        y2 = 590.00 / 1280
+        self.driver.find_element_by_id(usernameID).clear()
+        self.driver.find_element_by_id(passwordID).clear()
 
-        # 输入框删除图标在实际测试机型上的坐标位置
-        x_click1 = int(x1 * self.x)
-        y_click1 = int(y1 * self.y)
-        y_click2 = int(y2 * self.y)
-
-        # 测试输入框内的删除按钮功能
-        self.driver.find_element_by_id(usernameID).click()
-        time.sleep(3)
-        self.driver.tap([(x_click1, y_click1)])
-        self.assertEqual(self.driver.find_element_by_id(usernameID).text, u'用户名／手机号')
-        self.driver.find_element_by_id(passwordID).click()
-        self.driver.tap([(x_click1, y_click2)])
-
-        print '账号/密码错误及输入框内删除按钮测试通过'
+        print '账号/密码错误测试通过'
         time.sleep(3)
 
     # 账号/密码为空，登录按钮无法点击的用例

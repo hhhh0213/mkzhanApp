@@ -117,12 +117,13 @@ class SearchTest(unittest.TestCase):
         keyTest = ''.join(random.sample(tmp, random.randint(5, 10)))
         self.driver.find_element_by_id('com.xmtj.mkz:id/edit').send_keys('%s' % keyTest)
         self.driver.find_element_by_id('com.xmtj.mkz:id/cancel_sure').click()
-        WebDriverWait(self.driver, 30).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/no_search'))
-        no_search = self.driver.find_element_by_id('com.xmtj.mkz:id/no_search').text
-        if no_search.split('“')[1].split('”')[0] == keyTest:
+        time.sleep(2)
+        element_search = self.driver.find_element_by_id('android:id/list')
+        search_result = element_search.find_elements_by_class_name('android.widget.TextView')[0]
+        if search_result.text == u'主人,搜索不到目标':
             print '搜索 %s 关键词无结果，测试通过' % keyTest
         else:
-            pass
+            print '搜索无结果出错'
 
         # 搜索结果页面输入框内的删除图标相对坐标
         x1 = 560.00 / 720
