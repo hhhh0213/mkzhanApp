@@ -89,10 +89,10 @@ class ComicDetailTest(unittest.TestCase):
                     element_comic_more = self.driver.find_element_by_id(Page_config.PageID.comic_more_textID)
                     self.assertEqual(element_comic_more.text, u'大人，更多话在这里')
                     element_comic_more.click()
-                    element_comic_nums2 = self.driver.find_elements_by_id(Page_config.PageID.comic_numID)
+                    element_comic_nums1 = self.driver.find_elements_by_id(Page_config.PageID.comic_numID)
 
                     # 如果章节数大于12，滑动页面至底部，判断更多按钮文案是否正确
-                    if len(element_comic_nums2) > 12:
+                    if len(element_comic_nums1) > 12:
                         while True:
                             try:
                                 self.driver.find_element_by_id(Page_config.PageID.comic_recommendID)
@@ -109,7 +109,7 @@ class ComicDetailTest(unittest.TestCase):
                             return False
 
                     # 如果章节数点击更多按钮后，仍为12，则更多按钮逻辑有误
-                    elif len(element_comic_nums2) == 12:
+                    elif len(element_comic_nums1) == 12:
                         print '漫画详情页章节数等于12，仍然显示更多按钮，测试失败'
                         return False
                 except Exception, e:
@@ -215,9 +215,8 @@ class ComicDetailTest(unittest.TestCase):
         element_stars = element_star.find_elements_by_class_name('android.widget.ImageView')
         # 随机选择星级分数
         n = random.randint(0, 4)
-
+        # 判断是否存在打分时间
         try:
-            # 判断是否存在打分时间
             element_tips = self.driver.find_element_by_id('com.xmtj.mkz:id/tips')
             # 获取最近能打分时间
             element_tips_text1 = element_tips.text.split('：')[1].split('以后')[0]
@@ -231,7 +230,7 @@ class ComicDetailTest(unittest.TestCase):
             if t1 <= t2:
                 element_stars[n].click()
                 element_sure.click()
-                print '该漫画可以评分，随机打分：%d颗星，测试通过' % (n+1)
+                print '该漫画已过打分限制日期，可以评分，随机打分：%d颗星，测试通过' % (n+1)
             elif t1 > t2:
                 self.assertEqual(element_sure.get_attribute('clickable'), u'false')
                 print '该漫画已打过分，下次能打分时间为：%s，测试通过' % element_tips_text1
@@ -312,89 +311,65 @@ class ComicDetailTest(unittest.TestCase):
             print '用户月票数不足，无法投票，测试通过'
         time.sleep(1)
 
-        # 元宝区域功能测试
+        # 打赏元宝区域功能测试
         self.driver.find_element_by_id(Page_config.PageID.donateID).click()
         WebDriverWait(self.driver, 30).until(
             lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/tv_title'))
         element_title3 = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_title')
-        self.assertEqual(element_title3.text, u'打赏给喜欢的Ta')
+        self.assertEqual(element_title3.text, u'送礼物支持大大')
+        # 赠送按钮id
+        element_moneysure = self.driver.find_element_by_id('com.xmtj.mkz:id/btn_donate')
         # 获取用户元宝数
-        element_money = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_month_ticket').text
-        element_money_str = element_money.encode("utf-8")
+        element_money = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_balance')
+        element_money_str = element_money.text.encode("utf-8")
         element_money_num = filter(str.isdigit, element_money_str)
         print '用户当前总元宝数为：%s' % element_money_num
-        # 判断不同元宝数，确定按钮状态
-        global num2
-        if string.atoi(element_money_num) >= 100:
-            if string.atoi(element_money_num) >= 1000:
-                for num2 in range(0, 3):
-                    element_recyclers[num2].click()
-                    self.assertEqual(element_ok.get_attribute('clickable'), u'true')
-            elif 100 < string.atoi(element_money_num) < 1000:
-                element_recyclers[2].click()
-                self.assertEqual(element_ok.get_attribute('clickable'), u'false')
-                for num2 in range(0, 2):
-                    element_recyclers[num2].click()
-                    self.assertEqual(element_ok.get_attribute('clickable'), u'true')
-            elif string.atoi(element_money_num) == 100:
-                for num2 in range(1, 3):
-                    element_recyclers[num1].click()
-                    self.assertEqual(element_ok.get_attribute('clickable'), u'false')
-                num2 = 0
-                element_recyclers[0].click()
-                self.assertEqual(element_ok.get_attribute('clickable'), u'true')
 
-            # 获取打赏元宝数
-            element_recyclers_str1 = element_recyclers[num2].text.encode("utf-8")
-            element_recycler_num1 = filter(str.isdigit, element_recyclers_str1)
-            last_money = string.atoi(element_money_num) - string.atoi(element_recycler_num1)
-            # 测试打赏元宝是否成功，并查看剩余元宝
-            element_ok.click()
-            time.sleep(3)
+        # 获取礼物对应的元宝数字，并将其加入新序列
+        priceList = []
+        element_reward = self.driver.find_element_by_id('com.xmtj.mkz:id/vote_recycler')
+        element_rewardList = element_reward.find_elements_by_class_name('android.widget.LinearLayout')
+        element_priceList = self.driver.find_elements_by_id('com.xmtj.mkz:id/tv_price')
+        for x in range(0, len(element_priceList)):
+            element_priceText = element_priceList[x].text
+            element_priceText_str = element_priceText.encode("utf-8")
+            priceNum = filter(str.isdigit, element_priceText_str)
+            priceList.append(string.atoi(priceNum))
+
+        # 判断不同礼物的元宝数，确定按钮状态；测试元宝数大于0时，打赏功能是否正常
+        if string.atoi(element_money_num) > 0:
+            for num2 in range(0, len(element_rewardList)):
+                element_rewardList[num2].click()
+                if string.atoi(element_money_num) - priceList[num2] >= 0:
+                    self.assertEqual(element_moneysure.get_attribute('clickable'), u'true')
+                else:
+                    self.assertEqual(element_moneysure.get_attribute('clickable'), u'false')
+            element_rewardList[0].click()
+            element_moneysure.click()
+            time.sleep(2)
             self.driver.find_element_by_id(Page_config.PageID.donateID).click()
-            # 获取用户元宝数
-            element_money1 = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_month_ticket').text
-            element_money_str1 = element_money1.encode("utf-8")
-            element_money_num1 = string.atoi(filter(str.isdigit, element_money_str1))
-            self.assertEqual(last_money, element_money_num1)
-            print '打赏元宝测试通过，用户剩余元宝为：%d' % last_money
-            self.driver.find_element_by_id('com.xmtj.mkz:id/tv_cancel').click()
+            element_money_str1 = element_money.text.encode("utf-8")
+            element_money_num1 = filter(str.isdigit, element_money_str1)
+            if string.atoi(element_money_num) - string.atoi(element_money_num1) == 1:
+                print '打赏元宝测试通过，用户剩余元宝为：%s' % element_money_num1
+            else:
+                print '打赏元宝测试失败，用户剩余元宝为：%s' % element_money_num1
+        else:
+            for num2 in range(0, len(element_rewardList)):
+                element_rewardList[num2].click()
+                self.assertEqual(element_moneysure.get_attribute('clickable'), u'false')
+            print '用户元宝为：%s，无法打赏礼物，测试通过' % element_money_num
 
-        elif string.atoi(element_money_num) < 100:
-            for num1 in range(0, 3):
-                element_recyclers[num1].click()
-                self.assertEqual(element_ok.get_attribute('clickable'), u'false')
-            self.driver.find_element_by_id('com.xmtj.mkz:id/tv_cancel').click()
-            print '用户元宝数不足，无法打赏，测试通过'
-        time.sleep(2)
-
-    # 测试漫画详情页评论
-    def test_case_comicDetailCase4(self):
-        element_tab = self.driver.find_element_by_id('com.xmtj.mkz:id/tab_layout')
-        element_tabs = element_tab.find_elements_by_class_name('android.widget.FrameLayout')
-        # 点击评论
-        element_tabs[2].click()
+        # 测试充值元宝跳转
+        self.driver.find_element_by_id('com.xmtj.mkz:id/btn_charge').click()
         WebDriverWait(self.driver, 30).until(
-            lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/like_count'))
-        # 无内容不能点击评论按钮
-        element_send = self.driver.find_element_by_id('com.xmtj.mkz:id/send')
-        self.assertEqual(element_send.get_attribute('enabled'), u'false')
-        print '未输入评论内容时，无法点击发布，测试通过'
-        # 输入的内容不足4个字
-        self.driver.find_element_by_id('com.xmtj.mkz:id/edit').send_keys('123')
-        element_send.click()
-        print '评论不足4个字符时，发布不成功，测试通过'
-        time.sleep(1)
-        # 输入正确格式内容
-        self.driver.find_element_by_id('com.xmtj.mkz:id/edit').send_keys('1234')
-        element_send.click()
-        print '评论输入正确时，发布成功，测试通过'
-        time.sleep(1)
+            lambda driver: driver.find_element_by_id(Page_config.PageID.titleID))
+        element_title4 = self.driver.find_element_by_id(Page_config.PageID.titleID).text
+        self.assertEqual(element_title4, u'充值元宝')
+        print '打赏元宝处跳转充值元宝页面测试通过'
+        self.driver.find_element_by_accessibility_id('转到上一层级').click()
 
-        # 测试点赞功能
-        element_like = self.driver.find_elements_by_id('com.xmtj.mkz:id/like_count')
-        element_like[random.randint(0, len(element_like) - 1)].click()
-        print '点赞功能测试通过'
+        time.sleep(2)
 
     # 测试漫画其他功能区域（收藏，分享）
     def test_case_comicDetailCase3(self):
@@ -481,7 +456,33 @@ class ComicDetailTest(unittest.TestCase):
                 self.driver.press_keycode('4')
                 print '分享正常显示新浪微博icon并跳转H5页面，测试通过'
 
+    # 测试漫画详情页评论
+    def test_case_comicDetailCase4(self):
+        element_tab = self.driver.find_element_by_id('com.xmtj.mkz:id/tab_layout')
+        element_tabs = element_tab.find_elements_by_class_name('android.widget.FrameLayout')
+        # 点击评论
+        element_tabs[2].click()
+        WebDriverWait(self.driver, 30).until(
+            lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/like_count'))
+        # 无内容不能点击评论按钮
+        element_send = self.driver.find_element_by_id('com.xmtj.mkz:id/send')
+        self.assertEqual(element_send.get_attribute('enabled'), u'false')
+        print '未输入评论内容时，无法点击发布，测试通过'
+        # 输入的内容不足4个字
+        self.driver.find_element_by_id('com.xmtj.mkz:id/edit').send_keys('123')
+        element_send.click()
+        print '评论不足4个字符时，发布不成功，测试通过'
+        time.sleep(1)
+        # 输入正确格式内容
+        self.driver.find_element_by_id('com.xmtj.mkz:id/edit').send_keys('1234')
+        element_send.click()
+        print '评论输入正确时，发布成功，测试通过'
+        time.sleep(1)
 
+        # 测试点赞功能
+        element_like = self.driver.find_elements_by_id('com.xmtj.mkz:id/like_count')
+        element_like[random.randint(0, len(element_like) - 1)].click()
+        print '点赞功能测试通过'
 
 
 
