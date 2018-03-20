@@ -171,7 +171,12 @@ class LoginTest(unittest.TestCase):
             try:
                 # self.assertTrue(self.driver.wait_activity('.plugin.base.stub.WXEntryActivity', 10, 1))
                 print '正常跳转微信登录页面'
-                self.driver.press_keycode('4')
+                while True:
+                    try:
+                        self.driver.find_element_by_id('com.tencent.mm:id/hp').click()
+                        break
+                    except Exception, e:
+                        continue
             except Exception, e:
                 print '返回操作失败'
         else:
@@ -210,13 +215,20 @@ class LoginTest(unittest.TestCase):
         self.assertTrue(self.driver.wait_activity('.MainActivity', 20, 1))
         while True:
             try:
-                self.driver.find_element_by_id(loginOut).click()
+                self.driver.find_element_by_id(Page_config.PageID.settingID).click()
                 break
             except Exception, e:
                 Swipe_op.SwipeDown(self)
+        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.titleID))
 
+        while True:
+            try:
+                self.driver.find_element_by_id(Page_config.PageID.loginOut).click()
+                break
+            except Exception, e:
+                Swipe_op.SwipeDown(self)
+        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/msg'))
+        self.driver.find_element_by_id('com.xmtj.mkz:id/sure').click()
         print '登录成功测试通过'
         time.sleep(3)
-
-
 

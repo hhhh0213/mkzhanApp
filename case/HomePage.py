@@ -31,9 +31,19 @@ class HomePageTest(unittest.TestCase):
         cls.x = cls.driver.get_window_size()['width']
         cls.y = cls.driver.get_window_size()['height']
 
+        # 判断当前手机网络
+        network_num = cls.driver.network_connection
+        if network_num != 6:
+            # 开启手机wifi网络
+            cls.driver.set_network_connection(ConnectionType.WIFI_ONLY)
+
         time.sleep(6)
         # 判断是否存在收藏提醒
         go_comic.go_comic(cls)
+
+        # 设置首页顶部tab
+        element1 = cls.driver.find_element_by_id(Page_config.PageID.homeTab)
+        cls.elements1 = element1.find_elements_by_class_name('android.widget.FrameLayout')
 
     '''推荐页面各版块点击跳转操作'''
     def home_module(self, ModuleID, titleText, GridID, gridNum):
@@ -45,10 +55,17 @@ class HomePageTest(unittest.TestCase):
             except Exception, e:
                 Swipe_op.SwipeDown(self)
 
-        self.driver.wait_activity('.business.main.list.ComicListActivity', 5, 0.5)
-        self.assertEqual(self.driver.find_element_by_id('com.xmtj.mkz:id/title').text, titleText)
-        self.driver.find_element_by_accessibility_id('转到上一层级').click()
-        time.sleep(2)
+        if titleText != u'新作尝鲜':
+            self.driver.wait_activity('.business.main.list.ComicListActivity', 5, 0.5)
+            self.assertEqual(self.driver.find_element_by_id('com.xmtj.mkz:id/title').text, titleText)
+            self.driver.find_element_by_accessibility_id('转到上一层级').click()
+            time.sleep(2)
+        else:
+            WebDriverWait(self.driver, 30).until(
+                lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/count'))
+            element_ranklatest = self.driver.find_element_by_id('com.xmtj.mkz:id/rank_latest')
+            self.assertEqual(element_ranklatest.get_attribute('selected'), u'true')
+            self.elements1[2].click()
 
         # 根据各版块中的漫画数量定位展示
         while True:
@@ -77,10 +94,8 @@ class HomePageTest(unittest.TestCase):
 
     '''主页其他tab页面测试（男生/女生/更新页面）'''
     def home_tab1(self, choiceNum):
-        element1 = self.driver.find_element_by_id(Page_config.PageID.homeTab)
-        elements1 = element1.find_elements_by_class_name('android.widget.FrameLayout')
         # 进入对应页面
-        elements1[choiceNum].click()
+        self.elements1[choiceNum].click()
         time.sleep(3)
         # 随机下滑页面
         swipe_num = random.randint(1, 20)
@@ -134,12 +149,6 @@ class HomePageTest(unittest.TestCase):
 
     '''首页各操作测试用例'''
     def test_case_homePage1(self):
-        # 判断当前手机网络
-        network_num = self.driver.network_connection
-        if network_num != 6:
-            # 开启手机wifi网络
-            self.driver.set_network_connection(ConnectionType.WIFI_ONLY)
-            time.sleep(5)
         try:
             # 联网情况下，默认进入首页页面
             WebDriverWait(self.driver, 10).until(lambda driver: driver.find_element_by_id(Page_config.PageID.homeTab))
@@ -174,15 +183,19 @@ class HomePageTest(unittest.TestCase):
         print '客栈精品区域跳转及漫画点击测试通过'
 
         # 测试独家作品区域
-        self.home_module('com.xmtj.mkz:id/exclusive_layout', u'独家作品', 'com.xmtj.mkz:id/exclusive_grid_layout', 9)
+        self.home_module('com.xmtj.mkz:id/exclusive_layout', u'独家作品', 'com.xmtj.mkz:id/exclusive_grid_layout', 6)
         print '独家作品区域跳转及漫画点击测试通过'
 
         # 测试上升最快区域
-        self.home_module('com.xmtj.mkz:id/ascension_layout', u'上升最快', 'com.xmtj.mkz:id/ascension_grid_layout', 9)
+        self.home_module('com.xmtj.mkz:id/ascension_layout', u'上升最快', 'com.xmtj.mkz:id/ascension_grid_layout', 6)
         print '上升最快区域跳转及漫画点击测试通过'
 
+        # 测试新作尝鲜区域
+        self.home_module('com.xmtj.mkz:id/latest_layout', u'新作尝鲜', 'com.xmtj.mkz:id/latest_grid_layout', 3)
+        print '新作尝鲜区域跳转及漫画点击测试通过'
+
         # 测试合作作品区域
-        self.home_module('com.xmtj.mkz:id/cooperation_layout', u'合作作品', 'com.xmtj.mkz:id/cooperation_grid_layout', 9)
+        self.home_module('com.xmtj.mkz:id/cooperation_layout', u'合作作品', 'com.xmtj.mkz:id/cooperation_grid_layout', 6)
         print '合作作品区域跳转及漫画点击测试通过'
 
     def test_case_homePage2(self):
@@ -242,9 +255,7 @@ class HomePageTest(unittest.TestCase):
 
     def test_case_homePage4(self):
         # 进入排行页面
-        element1 = self.driver.find_element_by_id(Page_config.PageID.homeTab)
-        elements1 = element1.find_elements_by_class_name('android.widget.FrameLayout')
-        elements1[4].click()
+        self.elements1[4].click()
         time.sleep(3)
         # 测试人气榜
         self.home_tab2('com.xmtj.mkz:id/rank_popular', u'周点击')
