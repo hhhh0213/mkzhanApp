@@ -124,11 +124,16 @@ class HomeMineTest(unittest.TestCase):
         # 判断未登录资产记录区域应为空
         element_tab = self.driver.find_element_by_id('com.xmtj.mkz:id/tab_layout')
         element_list2 = element_tab.find_elements_by_class_name('android.widget.FrameLayout')
-        for num in range(0, len(element_list2)):
+        for num in range(0, 3):
             element_list2[num].click()
             WebDriverWait(self.driver, 10).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/empty_text'))
             element_empty_text = self.driver.find_element_by_id('com.xmtj.mkz:id/empty_text')
-            self.assertEqual(element_empty_text.text, u'这里空空如也')
+            if num == 0:
+                self.assertEqual(element_empty_text.text, u'主人的元宝记录为空！')
+            elif num == 1:
+                self.assertEqual(element_empty_text.text, u'主人的VIP记录为空！')
+            elif num == 2:
+                self.assertEqual(element_empty_text.text, u'主人的月票记录为空！')
             time.sleep(1)
         self.driver.find_element_by_accessibility_id('转到上一层级').click()
         print '未登录状态下检查元宝等记录显示测试通过'
@@ -251,7 +256,7 @@ class HomeMineTest(unittest.TestCase):
             tv_name = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_name').text
             re.search(str(tv_name), str(element_other_name))
             self.driver.find_element_by_id(Page_config.PageID.top_back).click()
-            print '跳转的漫画为：%s' % element_other_name
+            print '跳转的用户为：%s' % element_other_name
 
         print '动态列表随机点击跳转测试通过'
         time.sleep(1)
@@ -354,13 +359,13 @@ class HomeMineTest(unittest.TestCase):
         element_buyVip.click()
         WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.vip_info))
         self.driver.find_element_by_accessibility_id('转到上一层级').click()
-        print '登录状态下点击VIP状态的跳转VIP付费页面测试通过'
+        print '登录状态下点击我的账户中去续费跳转VIP付费页面测试通过'
 
         # 点击购买月票跳转
         element_ticket = self.driver.find_element_by_id(Page_config.PageID.buy_month_ticketID)
         self.assertEqual(element_ticket.text, u'购买')
         element_ticket.click()
-        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.vip_info))
+        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.ticket_info))
         self.driver.find_element_by_accessibility_id('转到上一层级').click()
         print '登录状态下点击月票链接跳转VIP付费页面测试通过'
 

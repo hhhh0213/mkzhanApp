@@ -124,7 +124,7 @@ class SearchTest(unittest.TestCase):
             print '搜索 %s 关键词无结果，测试通过' % keyTest
         else:
             print '搜索无结果出错'
-
+        '''
         # 搜索结果页面输入框内的删除图标相对坐标
         x1 = 560.00 / 720
         y1 = 90.00 / 1280
@@ -133,9 +133,19 @@ class SearchTest(unittest.TestCase):
         y_click1 = int(y1 * self.y)
         self.driver.tap([(x_click1, y_click1)])
         time.sleep(3)
+        '''
+        self.driver.press_keycode('4')
+        time.sleep(2)
 
     def test_case_searchCase5(self):
-        self.driver.find_element_by_id('com.xmtj.mkz:id/item_clear').click()
+        self.driver.find_element_by_id('com.xmtj.mkz:id/search').click()
+        element_history = self.driver.find_element_by_id('com.xmtj.mkz:id/history_layout')
+        element_title = element_history.find_elements_by_id('com.xmtj.mkz:id/title')
+        element_items = element_history.find_elements_by_id('com.xmtj.mkz:id/item_clear')
+        title1 = element_title[0].text
+        element_items[0].click()
+        title2 = element_title[0].text
+        self.assertNotEqual(title1, title2)
         time.sleep(2)
         self.driver.find_element_by_id('com.xmtj.mkz:id/clear_history').click()
         self.driver.find_element_by_id('com.xmtj.mkz:id/sure').click()
