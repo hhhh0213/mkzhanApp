@@ -132,9 +132,9 @@ class PageID(object):
     # 漫画详情页评分ID
     comic_scoreID = 'com.xmtj.mkz:id/comic_score'
     # 漫画详情页月票ID
-    vote_numID = 'com.xmtj.mkz:id/vote_num'
+    vote_numID = 'com.xmtj.mkz:id/comic_vote'
     # 漫画详情页元宝ID
-    donateID = 'com.xmtj.mkz:id/donate_layout'
+    donateID = 'com.xmtj.mkz:id/comic_donate'
 
     '''购买月票'''
     # 我的月票ID

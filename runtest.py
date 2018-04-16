@@ -2,14 +2,14 @@
 
 import unittest
 import HTMLTestRunnerCN
-from case import LoginPage, RegisterPage, ForgetPassword, HomePage, CategoryPage, SearchPage, HomeMine, ComicDetail, ReadPage
+from case import LoginPage, RegisterPage, ForgetPassword, HomePage, CategoryPage, SearchPage, HomeMine, ComicDetail, ReadPage, Comment
 
 
 # 定义测试套件
 def Test_suite():
     suite = unittest.TestSuite()
 
-    print '1.登录/2.注册/3.找回密码/4.首页/5.分类/6.搜索/7.我的/8.漫画详情页/9.漫画阅读页'
+    print '1.登录/2.注册/3.找回密码/4.首页/5.分类/6.搜索/7.我的/8.漫画详情页/9.评论页/10.漫画阅读页'
     num = raw_input('请输入要开始测试的用例：')
 
     if num == '1':
@@ -37,6 +37,9 @@ def Test_suite():
         print '即将开始执行漫画详情页页面测试用例'
         suite.addTest(unittest.makeSuite(ComicDetail.ComicDetailTest))
     elif num == '9':
+        print '即将开始执行评论页面测试用例'
+        suite.addTest(unittest.makeSuite(Comment.ComicCommentTest))
+    elif num == '10':
         print '即将开始执行漫画阅读页面测试用例'
         suite.addTest(unittest.makeSuite(ReadPage.ComicReadTest))
     else:
@@ -49,6 +52,7 @@ def Test_suite():
         suite.addTest(unittest.makeSuite(SearchPage.SearchTest))
         suite.addTest(unittest.makeSuite(HomeMine.HomeMineTest))
         suite.addTest(unittest.makeSuite(ComicDetail.ComicDetailTest))
+        suite.addTest(unittest.makeSuite(Comment.ComicCommentTest))
         suite.addTest(unittest.makeSuite(ReadPage.ComicReadTest))
 
     return suite
