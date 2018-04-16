@@ -81,7 +81,7 @@ class LoginTest(unittest.TestCase):
         # 开启手机wifi网络
         self.driver.set_network_connection(ConnectionType.WIFI_ONLY)
         time.sleep(5)
-'''
+
     # 账号/密码错误，登录失败的用例
     def test_case_loginCase2(self):
         self.driver.find_element_by_id(usernameID).send_keys(usernameTextEr)
@@ -138,22 +138,15 @@ class LoginTest(unittest.TestCase):
         self.driver.find_element_by_id(passwordID).clear()
         print '密码格式错误测试通过'
         time.sleep(3)
-
+'''
     # 第三方平台登录测试
     def test_case_loginCase5(self):
         qq = self.driver.is_app_installed('com.tencent.mobileqq')
         wx = self.driver.is_app_installed('com.tencent.mm')
         wb = self.driver.is_app_installed('com.sina.weibo')
-        # 通过QQ_ID定位的方式暂不可用，暂时采用相对坐标定位
-        x1 = 196.00 / 720
-        y1 = 1177.00 / 1280
-
-        # QQ登录图标在实际测试机型上的坐标位置
-        x_click = int(x1 * self.x)
-        y_click = int(y1 * self.y)
 
         # QQ登录
-        self.driver.tap([(x_click, y_click)])
+        self.driver.find_element_by_id(Page_config.PageID.thirdLogin_qq).click()
         if qq:
             # 判断是否进入QQ客户端登录页面
             self.assertTrue(self.driver.wait_activity('com.tencent.qqconnect.wtlogin.Login', 5, 1))

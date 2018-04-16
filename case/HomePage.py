@@ -240,11 +240,10 @@ class HomePageTest(unittest.TestCase):
 
         # 判断更新时间是否一致
         now_time = datetime.datetime.strftime(datetime.datetime.now(), '%Y.%m.%d')
-
-        element_comic = self.driver.find_element_by_id('com.xmtj.mkz:id/recycler')
-        elements_name = element_comic.find_elements_by_class_name('android.widget.TextView')
-        if elements_name[0].text != '完结':
-            comic_time = elements_name[0].text.split('：')[-1].split('更')[0]
+        comic_status = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_finish_txt')
+        elements_time = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_status_txt')
+        if comic_status.text != '完结':
+            comic_time = elements_time.text.split('更')[0]
             self.assertEqual(comic_time, now_time)
         else:
             pass

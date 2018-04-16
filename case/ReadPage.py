@@ -184,6 +184,8 @@ class ComicReadTest(unittest.TestCase):
         time.sleep(2)
 
         # 测试目录按钮
+        self.driver.tap([(x_click, y_click)])
+        time.sleep(1)
         self.driver.find_element_by_id('com.xmtj.mkz:id/tab_chapter').click()
         WebDriverWait(self.driver, 5).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/sort'))
         element_sort = self.driver.find_element_by_id('com.xmtj.mkz:id/sort')
@@ -192,6 +194,7 @@ class ComicReadTest(unittest.TestCase):
         time.sleep(3)
         self.assertEqual(element_sort.text, u'正序')
         self.driver.tap([(x_click, y_click)])
+        print '阅读页目录按钮功能测试通过'
 
         # 阅读页功能按钮
         self.driver.tap([(x_click, y_click)])
@@ -200,6 +203,7 @@ class ComicReadTest(unittest.TestCase):
         self.driver.find_element_by_id('com.xmtj.mkz:id/menu_feedback').click()
         WebDriverWait(self.driver, 5).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/tv_feedback'))
         self.driver.find_element_by_id(Page_config.PageID.backButtonID).click()
+        print '更多按钮功能跳转测试通过'
 
 
 
