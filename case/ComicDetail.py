@@ -38,7 +38,7 @@ class ComicDetailTest(unittest.TestCase):
         cls.driver.find_element_by_id(Page_config.PageID.tab_category).click()
 
         # 分类页面中随机选择一部漫画进入
-        for x in range(1, random.randint(1, 31)):
+        for num in range(1, random.randint(1, 31)):
             Swipe_op.SwipeDown(cls)
 
         element_names = cls.driver.find_elements_by_id('com.xmtj.mkz:id/name')
@@ -91,13 +91,17 @@ class ComicDetailTest(unittest.TestCase):
         except Exception, e:
             print '该作品简介无展开按钮'
 
-        # 作者区域点击跳转作者动态页面
+        # 作者区域点击跳转作者动态页面，并检查作者动态页面展示是否正确
         self.driver.find_element_by_id('com.xmtj.mkz:id/author_name').click()
         WebDriverWait(self.driver, 30).until(
-            lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/count_recycler'))
-        element_count = self.driver.find_element_by_id('com.xmtj.mkz:id/count_recycler')
-        element_counts = element_count.find_elements_by_id('com.xmtj.mkz:id/content_layout')
-        self.assertEqual(len(element_counts), 3)
+            lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/user_author_title'))
+        element_author = self.driver.find_element_by_id('com.xmtj.mkz:id/user_author_title')
+        self.assertEqual(element_author.text.split('(')[0], u'TA的作品')
+        try:
+            self.driver.find_element_by_id('com.xmtj.mkz:id/user_activity_header')
+            print '作者页面不应出现动态信息，测试错误！！！！！'
+        except Exception, e:
+            pass
         time.sleep(1)
         self.driver.find_element_by_id(Page_config.PageID.top_back).click()
         print '详情点击作者跳转测试通过'
@@ -291,6 +295,13 @@ class ComicDetailTest(unittest.TestCase):
         time.sleep(2)
 
         # 粉丝活跃榜跳转
+        while True:
+            try:
+                self.driver.find_element_by_id('com.xmtj.mkz:id/fans_layout')
+                break
+            except Exception, e:
+                Swipe_op.SwipeDown(self)
+                continue
         self.driver.find_element_by_id('com.xmtj.mkz:id/fans_layout').click()
         WebDriverWait(self.driver, 30).until(
             lambda driver: driver.find_element_by_id(Page_config.PageID.titleID))
@@ -343,10 +354,13 @@ class ComicDetailTest(unittest.TestCase):
             print '该漫画已被收藏，取消收藏测试通过'
         except Exception, e:
             print '该漫画未被收藏，添加收藏测试通过'
-        time.sleep(1)
+        time.sleep(3)
 
         # 测试点击跳转缓存页面
-        self.driver.find_element_by_id('com.xmtj.mkz:id/top_menu_cache').click()
+        try:
+            self.driver.find_element_by_id('com.xmtj.mkz:id/top_menu_cache').click()
+        except Exception, e:
+            self.driver.find_element_by_id('com.xmtj.mkz:id/menu_cache_red').click()
         WebDriverWait(self.driver, 30).until(
             lambda driver: driver.find_element_by_id(Page_config.PageID.titleID))
         element_title = self.driver.find_element_by_id(Page_config.PageID.titleID)
@@ -416,58 +430,3 @@ class ComicDetailTest(unittest.TestCase):
                                                                     '@content-desc="登录 - 新浪微博"]'))
                 self.driver.press_keycode('4')
                 print '分享正常显示新浪微博icon并跳转H5页面，测试通过'
-
-    '''
-    # 测试漫画详情页目录
-    def test_case_comicDetailCase1(self):
-        print '随机选择的漫画为：%s，测试该漫画详情页中的目录区域' % self.comic_name
-        time.sleep(1)
-
-        # 判断章节与更多按钮的展示逻辑是否正确
-        element_comic_nums = self.driver.find_elements_by_id(Page_config.PageID.comic_numID)
-
-        def assTrue1():
-            if len(element_comic_nums) < 12:
-                try:
-                    self.driver.find_elements_by_id(Page_config.PageID.comic_more_textID)
-                    print '漫画详情页章节数小于12，仍然显示更多按钮，测试失败'
-                    return False
-                except Exception, e:
-                    print '漫画详情页章节数小于12，不显示更多按钮，测试通过'
-                    return True
-            elif len(element_comic_nums) == 12:
-                # 判断章节数为12时，是否有显示更多按钮
-                try:
-                    element_comic_more = self.driver.find_element_by_id(Page_config.PageID.comic_more_textID)
-                    self.assertEqual(element_comic_more.text, u'大人，更多话在这里')
-                    element_comic_more.click()
-                    element_comic_nums1 = self.driver.find_elements_by_id(Page_config.PageID.comic_numID)
-
-                    # 如果章节数大于12，滑动页面至底部，判断更多按钮文案是否正确
-                    if len(element_comic_nums1) > 12:
-                        while True:
-                            try:
-                                self.driver.find_element_by_id(Page_config.PageID.comic_recommendID)
-                                break
-                            except Exception, e:
-                                Swipe_op.SwipeDown(self)
-                                continue
-                        try:
-                            self.assertEqual(element_comic_more.text, u'点击收起')
-                            print '漫画详情页章节数大于12，正常显示更多按钮，测试通过'
-                            return True
-                        except Exception, e:
-                            print '更多按钮点击后文案有误'
-                            return False
-
-                    # 如果章节数点击更多按钮后，仍为12，则更多按钮逻辑有误
-                    elif len(element_comic_nums1) == 12:
-                        print '漫画详情页章节数等于12，仍然显示更多按钮，测试失败'
-                        return False
-                except Exception, e:
-                    print '漫画详情页章节数等于12，不显示更多按钮，测试通过'
-                    return True
-
-        result = assTrue1()
-        self.assertTrue(result)
-    '''

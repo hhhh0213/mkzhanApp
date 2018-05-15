@@ -39,7 +39,10 @@ class HomePageTest(unittest.TestCase):
 
         time.sleep(6)
         # 判断是否存在收藏提醒
-        go_comic.go_comic(cls)
+        if go_comic.go_comic(cls) is True:
+            print '存在收藏更新提醒，点击关闭测试通过'
+        else:
+            pass
 
         # 设置首页顶部tab
         element1 = cls.driver.find_element_by_id(Page_config.PageID.homeTab)

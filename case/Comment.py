@@ -30,13 +30,16 @@ class ComicCommentTest(unittest.TestCase):
         time.sleep(5)
 
         # 判断是否存在收藏提醒
-        go_comic.go_comic(cls)
+        if go_comic.go_comic(cls) is True:
+            print '存在收藏更新提醒，点击关闭测试通过'
+        else:
+            pass
 
         # 进入分类页面
         cls.driver.find_element_by_id(Page_config.PageID.tab_category).click()
 
         # 分类页面中随机选择一部漫画进入
-        for x in range(1, random.randint(1, 31)):
+        for x in range(1, random.randint(3, 31)):
             Swipe_op.SwipeDown(cls)
 
         element_names = cls.driver.find_elements_by_id('com.xmtj.mkz:id/name')
@@ -84,6 +87,7 @@ class ComicCommentTest(unittest.TestCase):
         elif element_comment_num <= 99:
             self.assertEqual(element_comment_num, comment_num1)
         print '该漫画的评论数在漫画详情页显示为：%s，实际评论总数为：%d' % (comment_num, element_comment_num)
+        time.sleep(2)
 
         # 进入发表评论页面
         self.driver.find_element_by_xpath('//android.widget.ImageView[contains(@index,1)]').click()
@@ -113,7 +117,7 @@ class ComicCommentTest(unittest.TestCase):
             lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/comment_content'))
         self.driver.find_element_by_id('com.xmtj.mkz:id/comment_content').click()
         WebDriverWait(self.driver, 30).until(
-            lambda driver: driver.find_element_by_id(Page_config.PageID.titleID))
+            lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/send'))
         # 回复为空不能点击发布
         reply_comment = self.driver.find_element_by_id('com.xmtj.mkz:id/send')
         self.assertEqual(reply_comment.get_attribute('enabled'), u'false')
@@ -135,7 +139,7 @@ class ComicCommentTest(unittest.TestCase):
         # 刷新漫画详情页
         x1 = 520.00 / 1080
         y1 = 300.00 / 1920
-        y2 = 700.00 / 1920
+        y2 = 850.00 / 1920
         # 实际坐标
         x_swipe1 = int(x1 * self.x)
         y_swipe1 = int(y1 * self.y)
@@ -143,18 +147,22 @@ class ComicCommentTest(unittest.TestCase):
         self.driver.swipe(x_swipe1, y_swipe1, x_swipe1, y_swipe2, 3000)
         WebDriverWait(self.driver, 30).until(
             lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/comment_layout'))
+
         # 判断评论本地是否缓存成功
         self.driver.find_element_by_id('com.xmtj.mkz:id/comment_layout').click()
         WebDriverWait(self.driver, 30).until(
             lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/comment_content'))
-        comment_content_text2 = self.driver.find_element_by_id('com.xmtj.mkz:id/comment_content').text
-        self.assertEqual(comment_content_text2, u'不错不错，加油大大！')
+        comment_list1 = self.driver.find_elements_by_id('com.xmtj.mkz:id/comment_content')
+        comment_content = comment_list1[0].text
+        self.assertEqual(comment_content, u'不错不错，加油大大！')
         print '评论本地缓存成功'
-        self.driver.find_element_by_id('com.xmtj.mkz:id/comment_content').click()
-        comment_list = self.driver.find_element_by_id('android:id/list')
-        comment_layouts = comment_list.find_elements_by_class_name('android.widget.RelativeLayout')
-        reply_layout = comment_layouts[1].find_element_by_id('com.xmtj.mkz:id/comment_content')
-        self.assertEqual(reply_layout.text, u'6666')
+
+        # 进入评论详情页面
+        comment_list1[0].click()
+        time.sleep(3)
+        comment_list2 = self.driver.find_elements_by_id('com.xmtj.mkz:id/comment_content')
+        reply_content = comment_list2[1].text
+        self.assertEqual(reply_content, u'6666')
         print '评论回复本地缓存成功'
 
 

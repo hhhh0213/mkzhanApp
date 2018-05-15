@@ -81,7 +81,7 @@ class LoginTest(unittest.TestCase):
         # 开启手机wifi网络
         self.driver.set_network_connection(ConnectionType.WIFI_ONLY)
         time.sleep(5)
-
+    '''
     # 账号/密码错误，登录失败的用例
     def test_case_loginCase2(self):
         self.driver.find_element_by_id(usernameID).send_keys(usernameTextEr)
@@ -132,13 +132,13 @@ class LoginTest(unittest.TestCase):
             print '登录按钮不正确'
 
         # 获取并验证登录错误的toast提示
-        GetToast.find_toast(u'密码格式错误，只能包含数字，字母和特殊符号（6-16个字符）', 30, 0.1, self.driver)
+        GetToast.find_toast(u'账号或者密码错误', 30, 0.1, self.driver)
 
         self.driver.find_element_by_id(usernameID).clear()
         self.driver.find_element_by_id(passwordID).clear()
         print '密码格式错误测试通过'
         time.sleep(3)
-'''
+
     # 第三方平台登录测试
     def test_case_loginCase5(self):
         qq = self.driver.is_app_installed('com.tencent.mobileqq')

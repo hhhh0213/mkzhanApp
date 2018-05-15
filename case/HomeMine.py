@@ -153,10 +153,9 @@ class HomeMineTest(unittest.TestCase):
         time.sleep(1)
         self.driver.find_element_by_id(Page_config.PageID.backButtonID).click()
         print '未登录状态下点击问题反馈-我的反馈跳转测试通过'
-    
-    # 登录状态，个人动态页面展示
-    def test_case_homeMineCase2(self):
 
+    # 登录状态，关注、粉丝、元宝、月票点击跳转
+    def test_case_homeMineCase2(self):
         # 登录账号
         self.driver.find_element_by_id(Page_config.PageID.myImgID).click()
         WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.logInID))
@@ -164,119 +163,6 @@ class HomeMineTest(unittest.TestCase):
         self.driver.find_element_by_id(Page_config.PageID.passwordID).send_keys(Page_config.PageID.passwordText)
         self.driver.find_element_by_id(Page_config.PageID.logInID).click()
         time.sleep(2)
-
-        # 进入个人主页
-        element_mylogin = self.driver.find_element_by_id(Page_config.PageID.myLogin)
-        self.assertEqual(element_mylogin.text, u'查看个人主页')
-        element_mylogin.click()
-        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.myImgID))
-        
-        # 进入关注、粉丝页面测试功能
-        element_count = self.driver.find_element_by_id('com.xmtj.mkz:id/count_recycler')
-        element_contents = element_count.find_elements_by_id('com.xmtj.mkz:id/content_layout')
-
-        element_contents[0].click()     # 进入关注列表
-        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id('android:id/list'))
-        element_followList = self.driver.find_elements_by_id('com.xmtj.mkz:id/tv_name')
-        element_followButton = self.driver.find_elements_by_id('com.xmtj.mkz:id/tv_follow')
-        num1 = random.randint(0, len(element_followList) - 1)
-        element_follow = element_followList[num1]
-        element_follow_name = element_follow.text
-        print '关注列表随机选择的已关注用户为：%s' % element_follow_name
-
-        # 判断取消关注操作是否成功
-        element_followButton[num1].click()
-        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/msg'))
-        self.driver.find_element_by_id('com.xmtj.mkz:id/sure').click()
-        try:
-            if element_follow_name in element_followList.text:
-                print '取消关注操作测试失败'
-        except Exception, e:
-            print '关注列表取消关注测试通过'
-
-        time.sleep(2)
-        self.driver.find_element_by_id('com.xmtj.mkz:id/white_back').click()
-        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(Page_config.PageID.myImgID))
-
-        element_contents[1].click()  # 进入粉丝列表
-        WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id('android:id/list'))
-        element_fansList = self.driver.find_elements_by_id('com.xmtj.mkz:id/tv_name')
-        element_fansButton = self.driver.find_elements_by_id('com.xmtj.mkz:id/tv_follow')
-        num2 = random.randint(0, len(element_fansList) - 1)
-        element_fans_name = element_fansList[num2]
-        print '粉丝列表随机选择的用户为：%s' % element_fans_name.text
-
-        # 根据该粉丝状态，进行关注/取消关注操作测试
-        try:
-            if element_fansButton[num2].text == u'关注':
-                element_fansButton[num2].click()
-                time.sleep(1)
-                self.assertEqual(element_fansButton[num2].text, u'已关注')
-                print '粉丝列表关注测试通过'
-            elif element_fansButton[num2].text == u'已关注':
-                element_fansButton[num2].click()
-                WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/msg'))
-                self.driver.find_element_by_id('com.xmtj.mkz:id/sure').click()
-                self.assertEqual(element_fansButton[num2].text, u'关注')
-                print '粉丝列表取消关注测试通过'
-        except Exception, e:
-            print e
-
-        time.sleep(2)
-        self.driver.find_element_by_id('com.xmtj.mkz:id/white_back').click()
-        
-        element_tab = self.driver.find_element_by_id('com.xmtj.mkz:id/tab_layout')
-        element_tabs = element_tab.find_elements_by_class_name('android.widget.FrameLayout')
-
-        # 动态列表测试
-        element_tabs[0].click()
-        # 随机滑动页面后，选择第一个动态内容
-        element_activitys = self.driver.find_elements_by_id('com.xmtj.mkz:id/tv_activity')
-        element_details = self.driver.find_elements_by_id('com.xmtj.mkz:id/detail_layout')
-        element_activity = element_activitys[0]
-        element_detail = element_details[0]
-        print '动态页面随机选择的动态为：%s' % element_activity.text
-
-        # 判断该动态类型，并点击跳转测试
-
-        factor = '收藏|评论|打赏'
-        if re.search(factor, str(element_activity.text)) is not None:
-            element_comic_name = element_detail.find_element_by_id(Page_config.PageID.comic_name).text
-            element_detail.click()
-            WebDriverWait(self.driver, 30).until(lambda driver: driver.find_element_by_id(Page_config.PageID.comic_name))
-            element_comic1 = self.driver.find_element_by_id('com.xmtj.mkz:id/top_bg_layout')
-            comic_name2 = element_comic1.find_element_by_id(Page_config.PageID.comic_name).text
-            self.assertEqual(element_comic_name, comic_name2)
-            self.driver.find_element_by_id(Page_config.PageID.top_back).click()
-            print '跳转的漫画为：%s' % element_comic_name
-        elif re.search('关注', str(element_activity.text)) is not None:
-            element_other_name = element_detail.find_element_by_id('com.xmtj.mkz:id/tv_other_name').text
-            element_detail.click()
-            WebDriverWait(self.driver, 30).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/tv_name'))
-            tv_name = self.driver.find_element_by_id('com.xmtj.mkz:id/tv_name').text
-            re.search(str(tv_name), str(element_other_name))
-            self.driver.find_element_by_id(Page_config.PageID.top_back).click()
-            print '跳转的用户为：%s' % element_other_name
-
-        print '动态列表随机点击跳转测试通过'
-        time.sleep(1)
-
-        # 收藏列表测试
-        element_tabs[1].click()
-        for swipeNum in range(1, random.randint(1, 6)):
-            Swipe_op.SwipeDown(self)
-        element_names = self.driver.find_elements_by_id('com.xmtj.mkz:id/name')
-        element_name = element_names[random.randint(0, len(element_names) - 1)]
-        print '收藏页面随机选择的漫画为：%s' % element_name.text
-        element_name.click()
-        WebDriverWait(self.driver, 30).until(lambda driver: driver.find_element_by_id(Page_config.PageID.comic_read))
-        self.driver.find_element_by_id(Page_config.PageID.top_back).click()
-        self.driver.press_keycode('4')
-        print '收藏列表随机点击跳转测试通过'
-        time.sleep(1)
-
-    # 登录状态，关注、粉丝、元宝、月票点击跳转
-    def test_case_homeMineCase3(self):
         # 点击关注跳转
         self.driver.find_element_by_id('com.xmtj.mkz:id/follow_layout').click()
         WebDriverWait(self.driver, 30).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/tab_layout'))
@@ -311,7 +197,7 @@ class HomeMineTest(unittest.TestCase):
         print '我的页面关注、粉丝、元宝及月票tab按钮点击跳转测试通过'
     
     # VIP状态点击跳转
-    def test_case_homeMineCase4(self):
+    def test_case_homeMineCase3(self):
         element_vip_time = self.driver.find_element_by_id(Page_config.PageID.vip_info)
         element_vip_timeText = element_vip_time.text
         print '当前用户的VIP状态为：%s' % element_vip_time.text
@@ -334,7 +220,7 @@ class HomeMineTest(unittest.TestCase):
         time.sleep(2)
 
     # 我的账户点击跳转
-    def test_case_homeMineCase5(self):
+    def test_case_homeMineCase4(self):
         self.driver.find_element_by_id(Page_config.PageID.accountID).click()
         WebDriverWait(self.driver, 30).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/money_value'))
         # 获取元宝数
@@ -400,7 +286,7 @@ class HomeMineTest(unittest.TestCase):
         print '登录状态下检查元宝等记录显示测试通过'
 
     # 我的消息页面操作测试
-    def test_case_homeMineCase6(self):
+    def test_case_homeMineCase5(self):
         self.driver.find_element_by_id(Page_config.PageID.messageID).click()
         WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/tv_title'))
         # 随机向下滑动页面
@@ -530,7 +416,7 @@ class HomeMineTest(unittest.TestCase):
         self.driver.find_element_by_accessibility_id('转到上一层级').click()
 
     # 我的设置默认设置确认
-    def test_case_homeMineCase7(self):
+    def test_case_homeMineCase6(self):
         while True:
             try:
                 self.driver.find_element_by_id(Page_config.PageID.settingID).click()

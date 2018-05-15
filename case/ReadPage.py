@@ -32,7 +32,10 @@ class ComicReadTest(unittest.TestCase):
         time.sleep(5)
 
         # 判断是否存在收藏提醒
-        go_comic.go_comic(cls)
+        if go_comic.go_comic(cls) is True:
+            print '存在收藏更新提醒，点击关闭测试通过'
+        else:
+            pass
 
         # 进入分类页面
         cls.driver.find_element_by_id(Page_config.PageID.tab_category).click()
@@ -118,7 +121,6 @@ class ComicReadTest(unittest.TestCase):
             return False
 
     # 章节免费/已付费，可以正常阅读；否则跳过阅读页测试用例
-    @unittest.skipIf(test_case_comicReadCase1 is True, 'ererer')
     def test_case_comicReadCase2(self):
         # 获取屏幕中心位置
         x1 = 360.00 / 720
@@ -141,20 +143,21 @@ class ComicReadTest(unittest.TestCase):
         self.assertEqual(tab_screen.text, u'横屏')
         tab_screen.click()
         # 点击屏幕隐藏切换提示
-        x2 = 600.00 / 720
-        y2 = 250.00 / 1280
+        x2 = 560.00 / 720
+        y2 = 270.00 / 1280
         x_click1 = int(x2 * self.x)
         y_click1 = int(y2 * self.y)
         self.driver.tap([(x_click1, y_click1)])
         WebDriverWait(self.driver, 5).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/chapter'))
         # 随机下滑页面
-        swipe_num = random.randint(10, 60)
+        swipe_num = random.randint(20, 80)
         for x in range(1, swipe_num + 1):
             Swipe_op.SwipeDown(self)
         try:
             chapter_text1 = self.driver.find_element_by_id('com.xmtj.mkz:id/chapter').text
             chapter_position1 = self.driver.find_element_by_id('com.xmtj.mkz:id/chapter_position').text
             self.driver.tap([(x_click1, y_click1)])
+            time.sleep(1)
             self.assertEqual(tab_screen.text, u'竖屏')
             title_text1 = self.driver.find_element_by_id('com.xmtj.mkz:id/title').text
             print '随机向下滑动阅读页后，当前漫画章节进度为：%s；底部信息栏显示的章节信息为：%s %s' % (title_text1, chapter_text1, chapter_position1)
@@ -198,6 +201,7 @@ class ComicReadTest(unittest.TestCase):
 
         # 阅读页功能按钮
         self.driver.tap([(x_click, y_click)])
+        time.sleep(1)
         self.driver.find_element_by_id('com.xmtj.mkz:id/menu_more').click()
         WebDriverWait(self.driver, 5).until(lambda driver: driver.find_element_by_id('com.xmtj.mkz:id/menu_list'))
         self.driver.find_element_by_id('com.xmtj.mkz:id/menu_feedback').click()

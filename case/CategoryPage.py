@@ -32,7 +32,10 @@ class CategoryTest(unittest.TestCase):
         time.sleep(5)
 
         # 判断是否存在收藏提醒
-        go_comic.go_comic(cls)
+        if go_comic.go_comic(cls) is True:
+            print '存在收藏更新提醒，点击关闭测试通过'
+        else:
+            pass
 
         # 进入分类页面
         cls.driver.find_element_by_id('com.xmtj.mkz:id/tab_category').click()

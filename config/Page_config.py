@@ -29,7 +29,7 @@ class PageID(object):
     # 登录按钮ID
     logInID = 'com.xmtj.mkz:id/tv_login'
     # 忘记密码ID
-    forgetPasswordID = 'com.xmtj.mkz:id/forget_password'
+    forgetPasswordID = 'com.xmtj.mkz:id/tv_forget_password'
     # 充值密码ID
     resetPasswordID = 'com.xmtj.mkz:id/tv_reset'
     # 注册按钮ID

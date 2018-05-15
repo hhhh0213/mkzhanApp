@@ -62,7 +62,7 @@ class ForgetPassTest(unittest.TestCase):
     def tearDownClass(cls):
         cls.driver.quit()
 
-    '''手机号输入错误，重置密码失败的用例'''
+    # 手机号输入错误，重置密码失败的用例
     def test_case_forgetPassEr1(self):
         # 判断页面标题是否正确
         try:
@@ -100,7 +100,7 @@ class ForgetPassTest(unittest.TestCase):
         print '手机号输入有误的情况，测试通过'
         time.sleep(3)
 
-    '''验证码输入有误，重置密码失败的用例'''
+    # 验证码输入有误，重置密码失败的用例
     def test_case_forgetPassEr2(self):
         self.driver.find_element_by_id(usernameID).send_keys(userNumText)
         self.driver.find_element_by_id(numID).send_keys('1231')
@@ -118,7 +118,7 @@ class ForgetPassTest(unittest.TestCase):
         print '验证码有误的情况，测试通过'
         time.sleep(3)
 
-    '''密码格式输入有误，重置密码失败的用例'''
+    # 密码格式输入有误，重置密码失败的用例
     def test_case_forgetPassEr3(self):
         self.driver.find_element_by_id(passwordID).send_keys(passwordTextEr)
         self.driver.find_element_by_id(resetPasswordID).click()
@@ -133,22 +133,6 @@ class ForgetPassTest(unittest.TestCase):
         text2 = self.driver.find_element_by_id(passwordID).text
         # 判断密文与明文显示，不同则通过
         self.assertNotEqual(text1, text2)
-
-        # 注册页面密码输入框删除图标在默认机型上的相对坐标
-        x1 = 514.00 / 720
-        y1 = 452.00 / 1280
-        # 注册页面密码输入框删除图标在实际测试机型上的坐标位置
-        x_click = int(x1 * self.x)
-        y_click = int(y1 * self.y)
-
-        # 密码清空后，明文按钮应为空，以此判断是否正常清理及清理后按钮消失
-        self.driver.find_element_by_id(passwordID).click()
-        self.driver.tap([(x_click, y_click)])
-        try:
-            if self.driver.find_element_by_id(view_passID) is not None:
-                print '清空密码出错'
-        except Exception, e:
-            pass
 
         print '密码格式有误的情况及密码明文显示与删除，测试通过'
         time.sleep(2)
